@@ -1,0 +1,66 @@
+version: '3.8'
+
+networks:
+  main-net:
+    external: true
+
+
+services:
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    deploy:
+      replicas: 1
+    ports:
+      - 9090:9090
+    volumes:
+      - "./prometheus.yml:/etc/prometheus/prometheus.yml"
+
+  simple-pull-file:
+    build:
+      context: ./simple-pull
+      dockerfile: Dockerfile.file
+    image: simple_pull_file_img
+    container_name: simple_pull_file
+    deploy:
+      replicas: 1
+    volumes:
+      - /var/my_home
+    environment:
+      MY_VAR: myvar
+    restart: always
+
+  simple-pull-rest:
+    build:
+      context: ./simple-pull
+      dockerfile: Dockerfile.rest
+    image: simple_pull_img_rest
+    container_name: simple_pull_rest
+    deploy:
+      replicas: 1
+    ports:
+      - '8081:8081'
+    volumes:
+      - /var/my_home
+    environment:
+      MY_VAR: myvar
+    restart: always
+
+  simple-rest:
+    build:
+      context: ./simple-rest
+      dockerfile: Dockerfile
+    image: simple_rest_img
+    container_name: simple_rest
+    deploy:
+      replicas: 1
+    ports:
+      - '8080:8080'
+    restart: always
+    #networks:
+    #  - jenkins-net
+    #command: >
+        #  /bin/bash -c "
+      #[[ $$(curl 0.0.0.0:5000/v2/_catalog | jq \".repositories\" | wc -l) -ge 6 ]]
+      #"

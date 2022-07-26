@@ -1,2 +1,3 @@
-mvn archetype:generate -DgroupId=com.demo -DartifactId=hellomaven -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
-mvn archetype:generate -DarchetypeGroupId=org.apache.maven.archetypes -DarchetypeArtifactId=maven-archetype-quickstart -DarchetypeVersion=1.4
+[prometheus](http://localhost:9090)
+[OS stats](http://localhost:8080)
+[MKS position](http://localhost:8081)
