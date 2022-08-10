@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+if [ ${0##*/} == "ls" ]; then
+  ls -al
+fi
+
+
+if [ ${0##*/} == "df" ]; then
+  df -h
+fi

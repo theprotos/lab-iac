@@ -1,0 +1,6 @@
+FROM ubuntu
+
+RUN apt-get -y -qq update && \
+  apt-get -y -qq install python3 &&\
+  apt-get autoremove -y -q &&\
+  apt-get clean -y -q

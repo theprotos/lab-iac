@@ -1,0 +1,71 @@
+version: '3.8'
+
+networks:
+  net1:
+    ipam:
+      config:
+        - subnet: 10.11.0.0/24
+
+services:
+
+  master:
+    build:
+      context: .
+      dockerfile: Dockerfile.master
+    image: ansible-master
+    container_name: ansible-master
+    deploy:
+      replicas: 1
+    ports:
+      - '22'
+    restart: always
+    networks:
+      net1:
+        ipv4_address: 10.11.0.2
+    command: bash -c "
+             export PATH=$PATH:/root/.local/bin && tail -f /dev/null"
+
+  node-ubuntu:
+    build:
+      context: .
+      dockerfile: Dockerfile.ubuntu
+    image: ubuntu
+    container_name: node-ubuntu
+    deploy:
+      replicas: 1
+    ports:
+      - '22'
+    restart: always
+    networks:
+      net1:
+        ipv4_address: 10.11.0.3
+    command: bash -c "
+      export PATH=$PATH:/root/.local/bin && tail -f /dev/null"
+
+  node-centos:
+    image: centos
+    container_name: node-centos
+    deploy:
+      replicas: 1
+    ports:
+      - '22'
+    restart: always
+    networks:
+      net1:
+        ipv4_address: 10.11.0.4
+    command: bash -c "
+      export PATH=$PATH:/root/.local/bin && tail -f /dev/null"
+
+  node-alpine:
+    image: alpine
+    container_name: node-alpine
+    deploy:
+      replicas: 1
+    ports:
+      - '22'
+    restart: always
+    networks:
+      net1:
+        ipv4_address: 10.11.0.5
+    command: bash -c "
+      export PATH=$PATH:/root/.local/bin && tail -f /dev/null"

@@ -1,0 +1,5 @@
+FROM centos
+
+RUN yum -y -qq update && \
+  yum -y -qq install python3 &&\
+  yum clean all

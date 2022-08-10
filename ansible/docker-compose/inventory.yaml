@@ -1,0 +1,6 @@
+all:
+  hosts:
+  unix:
+    node-ubuntu:
+    node-centos:
+    node-alpine:
