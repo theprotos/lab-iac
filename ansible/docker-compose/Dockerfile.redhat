@@ -1,19 +1,16 @@
-FROM ubuntu
+FROM redhat/ubi9
 
-USER root
+COPY scripts/redhat-entrypoint.sh /docker-entrypoint.sh
 
-COPY scripts/ubuntu-entrypoint.sh /docker-entrypoint.sh
-
-RUN apt-get -y -qq update &&\
-  apt-get -y -qq install openssh-server python3 iputils-ping python3-pip &&\
+RUN yum -y -qq update && \
+  yum -y -qq install python3 openssh-server &&\
   chmod +x /docker-entrypoint.sh &&\
   (useradd -m ansible -s /bin/bash || true) &&\
   (echo "ansible:ansible" | chpasswd) &&\
   su - ansible -c "mkdir -p ~/.ssh" &&\
   su - ansible -c "chmod 700 ~/.ssh" &&\
-  systemctl enable ssh &&\
-  apt-get autoremove -y -q &&\
-  apt-get clean -y -q
+  yum clean all
+
 
 EXPOSE 22
 

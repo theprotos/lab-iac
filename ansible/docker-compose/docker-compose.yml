@@ -5,6 +5,8 @@ networks:
     ipam:
       config:
         - subnet: 10.11.0.0/24
+volumes:
+  ssh-key:
 
 services:
 
@@ -14,6 +16,8 @@ services:
       dockerfile: Dockerfile.master
     image: ansible-master
     container_name: ansible-master
+    volumes:
+      - ssh-key:/tmp/ansible:ro
     deploy:
       replicas: 1
     ports:
@@ -22,15 +26,18 @@ services:
     networks:
       net1:
         ipv4_address: 10.11.0.2
-    command: bash -c "
-             export PATH=$PATH:/root/.local/bin && tail -f /dev/null"
+    command: sh -c "
+                    tail -f /dev/null
+                   "
 
   node-ubuntu:
     build:
       context: .
       dockerfile: Dockerfile.ubuntu
-    image: ubuntu
+    image: node-ubuntu
     container_name: node-ubuntu
+    volumes:
+      - ssh-key:/tmp/ansible
     deploy:
       replicas: 1
     ports:
@@ -39,12 +46,16 @@ services:
     networks:
       net1:
         ipv4_address: 10.11.0.3
-    command: bash -c "
-      export PATH=$PATH:/root/.local/bin && tail -f /dev/null"
 
-  node-centos:
-    image: centos
-    container_name: node-centos
+  node-redhat:
+    privileged: true
+    build:
+      context: .
+      dockerfile: Dockerfile.redhat
+    image: node-redhat
+    container_name: node-redhat
+    volumes:
+      - ssh-key:/tmp/ansible/
     deploy:
       replicas: 1
     ports:
@@ -53,12 +64,18 @@ services:
     networks:
       net1:
         ipv4_address: 10.11.0.4
-    command: bash -c "
-      export PATH=$PATH:/root/.local/bin && tail -f /dev/null"
+    command: sh -c "
+                    tail -f /dev/null
+                   "
 
   node-alpine:
+    build:
+      context: .
+      dockerfile: Dockerfile.alpine
     image: alpine
     container_name: node-alpine
+    volumes:
+      - ssh-key:/tmp/ansible/
     deploy:
       replicas: 1
     ports:
@@ -67,5 +84,22 @@ services:
     networks:
       net1:
         ipv4_address: 10.11.0.5
-    command: bash -c "
-      export PATH=$PATH:/root/.local/bin && tail -f /dev/null"
+    command: sh -c "
+                    tail -f /dev/null
+                  "
+  node-rockylinux:
+    image: rockylinux:9
+    container_name: node-rockylinux
+    volumes:
+      - ssh-key:/tmp/ansible/
+    deploy:
+      replicas: 1
+    ports:
+      - '22'
+    restart: always
+    networks:
+      net1:
+        ipv4_address: 10.11.0.6
+    command: sh -c "
+      tail -f /dev/null
+      "

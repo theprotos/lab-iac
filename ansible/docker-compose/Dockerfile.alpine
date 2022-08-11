@@ -1,0 +1,13 @@
+FROM alpine
+
+
+RUN apk update &&\
+  apk add --update --no-cache bash openssh-server-common python3 python3-pip &&\
+  useradd -m user -s /bin/bash &&\
+  (echo "ansible:ansible" | chpasswd) &&\
+  su - ansible -c "mkdir -p ~/.ssh" &&\
+  su - ansible -c "chmod 700 ~/.ssh" &&\
+
+EXPOSE 22
+
+CMD ["/usr/sbin/sshd", "-D"]
