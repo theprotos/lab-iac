@@ -1,0 +1,24 @@
+FROM alpine
+
+COPY scripts/alpine-entrypoint.sh /docker-entrypoint.sh
+
+RUN apk update &&\
+  apk add --update --no-cache openrc openssh-keygen openssh python3 py3-pip &&\
+  (adduser ansible -D -s /bin/sh || true) &&\
+  (echo "ansible:ansible" | chpasswd) &&\
+  rc-status &&\
+  mkdir -p /run/openrc &&\
+  touch /run/openrc/softlevel &&\
+  su - ansible -c "mkdir -p ~/.ssh" &&\
+  su - ansible -c "chmod 700 ~/.ssh"
+
+# rc-status
+# rc-service --list | grep -i sshd
+# rc-service sshd status
+# rc-service sshd start
+# /usr/sbin/sshd -D -e
+
+EXPOSE 22
+
+ENTRYPOINT ["sh", "/docker-entrypoint.sh"]
+CMD ["tail", "-f", "/dev/null"]

@@ -1,0 +1,18 @@
+FROM rockylinux:9
+
+COPY scripts/redhat-entrypoint.sh /docker-entrypoint.sh
+
+RUN yum -y -qq update && \
+  yum -y -qq install python3 openssh-server &&\
+  chmod +x /docker-entrypoint.sh &&\
+  (useradd -m ansible -s /bin/bash || true) &&\
+  (echo "ansible:ansible" | chpasswd) &&\
+  su - ansible -c "mkdir -p ~/.ssh" &&\
+  su - ansible -c "chmod 700 ~/.ssh" &&\
+  rm -rf /run/nologin &&\
+  yum clean all
+
+EXPOSE 22
+
+ENTRYPOINT ["sh", "/docker-entrypoint.sh"]
+CMD ["tail", "-f", "/dev/null"]

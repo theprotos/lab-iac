@@ -13,9 +13,9 @@ services:
   master:
     build:
       context: .
-      dockerfile: Dockerfile.master
-    image: ansible-master
-    container_name: ansible-master
+      dockerfile: dockerfiles/Dockerfile.ansible
+    image: ansible
+    container_name: ansible
     volumes:
       - ssh-key:/tmp/ansible:ro
     deploy:
@@ -33,11 +33,11 @@ services:
   node-ubuntu:
     build:
       context: .
-      dockerfile: Dockerfile.ubuntu
+      dockerfile: dockerfiles/Dockerfile.ubuntu
     image: node-ubuntu
     container_name: node-ubuntu
     volumes:
-      - ssh-key:/tmp/ansible
+      - ssh-key:/tmp/ansible:ro
     deploy:
       replicas: 1
     ports:
@@ -51,7 +51,7 @@ services:
     privileged: true
     build:
       context: .
-      dockerfile: Dockerfile.redhat
+      dockerfile: dockerfiles/Dockerfile.redhat
     image: node-redhat
     container_name: node-redhat
     volumes:
@@ -71,11 +71,11 @@ services:
   node-alpine:
     build:
       context: .
-      dockerfile: Dockerfile.alpine
-    image: alpine
+      dockerfile: dockerfiles/Dockerfile.alpine
+    image: node-alpine
     container_name: node-alpine
     volumes:
-      - ssh-key:/tmp/ansible/
+      - ssh-key:/tmp/ansible:ro
     deploy:
       replicas: 1
     ports:
@@ -84,11 +84,12 @@ services:
     networks:
       net1:
         ipv4_address: 10.11.0.5
-    command: sh -c "
-                    tail -f /dev/null
-                  "
+
   node-rockylinux:
-    image: rockylinux:9
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.rockylinux
+    image: node-rockylinux
     container_name: node-rockylinux
     volumes:
       - ssh-key:/tmp/ansible/
