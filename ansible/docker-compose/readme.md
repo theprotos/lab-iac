@@ -1,7 +1,7 @@
 ## Ansible env
 
 Consists of:
-- ansible
+- ansible + [ARA](http://localhost:8000/)
 - node_alpine
 - node_redhat
 - node_ubuntu
@@ -22,7 +22,17 @@ Connect to ansible
 ```
 docker exec -it ansible bash
 ansible -i inventory.yaml all -m ping
-ansible -i inventory.yaml all -m setup
+ansible-playbook -i inventory.yaml playbook.yaml
+```
+
+Run ARA
+```
+python3 -m ara.setup.callback_plugins
+export ANSIBLE_CALLBACK_PLUGINS=$(python3 -m ara.setup.callback_plugins)
+ara-manage migrate
+ansible-playbook -i inventory.yaml playbook.yaml
+ara playbook list
+ara-manage runserver 0.0.0.0:8000
 ```
 
 

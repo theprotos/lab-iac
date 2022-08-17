@@ -1,7 +1,7 @@
-pip install docker-compose
+# Ansible playground
 
-
-docker run -v ${PWD}:/data --rm -it quay.io/ansible/awx bash
+- docker-compose creates infra with master-nodes
+- minukube for AWX
 
 
 

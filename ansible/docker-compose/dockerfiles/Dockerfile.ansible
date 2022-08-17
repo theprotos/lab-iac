@@ -2,15 +2,19 @@ FROM ubuntu
 
 ENV ANSIBLE_CALLBACK_PLUGINS="$(python3 -m ara.setup.callback_plugins)" \
     PATH=$PATH:~/.local/bin \
-    ANSIBLE_HOST_KEY_CHECKING=False
+    ANSIBLE_HOST_KEY_CHECKING=False \
+    ANSIBLE_REPO="https://raw.githubusercontent.com/theprotos/lab-iac/master/ansible/ansible-repo"
+
+COPY scripts/ansible-entrypoint.sh /docker-entrypoint.sh
 
 USER root
 
 RUN apt-get -y -qq update &&\
-  apt-get -y -qq install openssh-client python3 iputils-ping python3-pip &&\
+  apt-get -y -qq install sudo openssh-client python3 iputils-ping python3-pip &&\
   echo "StrictHostKeyChecking no" >> /etc/ssh_config &&\
   (useradd -m ansible -s /bin/bash || true) &&\
   (echo "ansible:ansible" | chpasswd) &&\
+  echo "ansible ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/ansible &&\
   apt-get autoremove -y -q &&\
   apt-get clean -y -q
 
@@ -19,11 +23,16 @@ USER ansible
 RUN mkdir -p ~/.ssh &&\
   mkdir -p /tmp/ansible &&\
   python3 -m pip install --user ansible "ara[server]" &&\
-  export ANSIBLE_CALLBACK_PLUGINS="$(python3 -m ara.setup.callback_plugins)" &&\
   export PATH=$PATH:~/.local/bin &&\
-  export ANSIBLE_HOST_KEY_CHECKING=False &&\
+  export ANSIBLE_CALLBACK_PLUGINS="$(python3 -m ara.setup.callback_plugins)" &&\
+  export ANSIBLE_HOST_KEY_CHECKING=False1 &&\
   ssh-keygen -q -t rsa -N '' -f ~/.ssh/ansible &&\
   cp ~/.ssh/ansible.pub /tmp/ansible/ansible.pub
 
-COPY inventory.yaml /home/ansible/
+COPY playbook.yaml inventory.yaml /home/ansible/
+ADD $ANSIBLE_REPO/ansible.cfg /home/ansible/
+
 WORKDIR /home/ansible
+
+ENTRYPOINT ["/bin/bash"]
+CMD ["tail", "-f", "/dev/null"]

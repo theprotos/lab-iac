@@ -10,7 +10,7 @@ def hello():
     return render_template('index.html')
 
 
-@app.route("/postion", methods=['GET'])
+@app.route("/position", methods=['GET'])
 def getposition():
     response = urllib.request.urlopen('http://api.open-notify.org/iss-now.json')
     html = response.read()

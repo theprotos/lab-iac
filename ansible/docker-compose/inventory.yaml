@@ -13,3 +13,10 @@ all:
       vars:
         ansible_user: ansible
         ansible_ssh_private_key_file: '~/.ssh/ansible'
+    webservers:
+      hosts:
+        node-ubuntu:
+        node-redhat:
+      vars:
+        ansible_user: ansible
+        ansible_ssh_private_key_file: '~/.ssh/ansible'

@@ -3,9 +3,10 @@ FROM alpine
 COPY scripts/alpine-entrypoint.sh /docker-entrypoint.sh
 
 RUN apk update &&\
-  apk add --update --no-cache openrc openssh-keygen openssh python3 py3-pip &&\
+  apk add --update --no-cache sudo openrc openssh-keygen openssh python3 py3-pip &&\
   (adduser ansible -D -s /bin/sh || true) &&\
   (echo "ansible:ansible" | chpasswd) &&\
+  echo "ansible ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/ansible &&\
   rc-status &&\
   mkdir -p /run/openrc &&\
   touch /run/openrc/softlevel &&\
@@ -21,4 +22,3 @@ RUN apk update &&\
 EXPOSE 22
 
 ENTRYPOINT ["sh", "/docker-entrypoint.sh"]
-CMD ["tail", "-f", "/dev/null"]

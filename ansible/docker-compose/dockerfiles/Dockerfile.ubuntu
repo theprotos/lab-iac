@@ -5,17 +5,17 @@ USER root
 COPY scripts/ubuntu-entrypoint.sh /docker-entrypoint.sh
 
 RUN apt-get -y -qq update &&\
-  apt-get -y -qq install openssh-server python3 iputils-ping python3-pip &&\
+  apt-get -y -qq install sudo openssh-server python3 iputils-ping python3-pip &&\
   chmod +x /docker-entrypoint.sh &&\
   (useradd -m ansible -s /bin/bash || true) &&\
   (echo "ansible:ansible" | chpasswd) &&\
   su - ansible -c "mkdir -p ~/.ssh" &&\
   su - ansible -c "chmod 700 ~/.ssh" &&\
   systemctl enable ssh &&\
+  echo "ansible ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/ansible &&\
   apt-get autoremove -y -q &&\
   apt-get clean -y -q
 
 EXPOSE 22
 
 ENTRYPOINT ["sh", "/docker-entrypoint.sh"]
-CMD ["tail", "-f", "/dev/null"]

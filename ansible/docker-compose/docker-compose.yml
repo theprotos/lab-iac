@@ -10,7 +10,7 @@ volumes:
 
 services:
 
-  master:
+  ansible:
     build:
       context: .
       dockerfile: dockerfiles/Dockerfile.ansible
@@ -22,6 +22,7 @@ services:
       replicas: 1
     ports:
       - '22'
+      - '8000:8000'
     restart: always
     networks:
       net1:
@@ -101,6 +102,3 @@ services:
     networks:
       net1:
         ipv4_address: 10.11.0.6
-    command: sh -c "
-      tail -f /dev/null
-      "
