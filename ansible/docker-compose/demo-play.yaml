@@ -6,7 +6,7 @@
   tasks:
     - name: ensure apache is at the latest version
       package:
-        name: httpd
+        name: apache2
         state: latest
     - name: ensure apache is running
       service:

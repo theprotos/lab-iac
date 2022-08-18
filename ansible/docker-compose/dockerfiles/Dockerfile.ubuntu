@@ -4,10 +4,11 @@ USER root
 
 COPY scripts/ubuntu-entrypoint.sh /docker-entrypoint.sh
 
-RUN apt-get -y -qq update &&\
-  apt-get -y -qq install sudo openssh-server python3 iputils-ping python3-pip &&\
+RUN apt-get -y -qq update
+
+RUN  apt-get -y -qq install sudo openssh-server python3 iputils-ping python3-pip &&\
   chmod +x /docker-entrypoint.sh &&\
-  (useradd -m ansible -s /bin/bash || true) &&\
+  (useradd -m ansible -s /bin/sh || true) &&\
   (echo "ansible:ansible" | chpasswd) &&\
   su - ansible -c "mkdir -p ~/.ssh" &&\
   su - ansible -c "chmod 700 ~/.ssh" &&\

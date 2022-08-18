@@ -1,0 +1,5 @@
+---
+- src: ansible
+  version: v6.2.0
+- src: ara[server]
+  version: 1.5.8

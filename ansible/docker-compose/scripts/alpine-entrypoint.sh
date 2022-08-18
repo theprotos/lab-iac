@@ -5,4 +5,5 @@ chown ansible:ansible /home/ansible/.ssh/authorized_keys 2>/dev/null || :
 # systemctl start sshd
 rc-status
 rc-service -i sshd restart
+tail -f dev/null
 exec "$@"

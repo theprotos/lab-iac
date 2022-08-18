@@ -1,17 +1,18 @@
 FROM alpine
 
+ARG USERNAME=ansible
 COPY scripts/alpine-entrypoint.sh /docker-entrypoint.sh
 
 RUN apk update &&\
   apk add --update --no-cache sudo openrc openssh-keygen openssh python3 py3-pip &&\
-  (adduser ansible -D -s /bin/sh || true) &&\
-  (echo "ansible:ansible" | chpasswd) &&\
-  echo "ansible ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/ansible &&\
+  (adduser $USERNAME -D -s /bin/sh || true) &&\
+  (echo "$USERNAME:$USERNAME" | chpasswd) &&\
+  echo "ansible ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/$USERNAME &&\
   rc-status &&\
   mkdir -p /run/openrc &&\
   touch /run/openrc/softlevel &&\
-  su - ansible -c "mkdir -p ~/.ssh" &&\
-  su - ansible -c "chmod 700 ~/.ssh"
+  su - $USERNAME -c "mkdir -p ~/.ssh" &&\
+  su - $USERNAME -c "chmod 700 ~/.ssh"
 
 # rc-status
 # rc-service --list | grep -i sshd

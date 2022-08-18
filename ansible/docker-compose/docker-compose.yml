@@ -1,21 +1,21 @@
 version: '3.8'
 
-networks:
-  net1:
-    ipam:
-      config:
-        - subnet: 10.11.0.0/24
+#networks:
+#  net1:
+#    ipam:
+#      config:
+#        - subnet: 10.11.0.0/24
 volumes:
   ssh-key:
 
 services:
 
-  ansible:
+  ansible1:
     build:
       context: .
-      dockerfile: dockerfiles/Dockerfile.ansible
-    image: ansible
-    container_name: ansible
+      dockerfile: dockerfiles/Dockerfile.ansible1
+    image: ansible1
+    container_name: ansible1
     volumes:
       - ssh-key:/tmp/ansible:ro
     deploy:
@@ -24,9 +24,9 @@ services:
       - '22'
       - '8000:8000'
     restart: always
-    networks:
-      net1:
-        ipv4_address: 10.11.0.2
+#    networks:
+#      net1:
+#        ipv4_address: 10.11.0.2
     command: sh -c "
                     tail -f /dev/null
                    "
@@ -44,12 +44,12 @@ services:
     ports:
       - '22'
     restart: always
-    networks:
-      net1:
-        ipv4_address: 10.11.0.3
+#    networks:
+#      net1:
+#        ipv4_address: 10.11.0.3
 
   node-redhat:
-    privileged: true
+    # privileged: true
     build:
       context: .
       dockerfile: dockerfiles/Dockerfile.redhat
@@ -62,9 +62,9 @@ services:
     ports:
       - '22'
     restart: always
-    networks:
-      net1:
-        ipv4_address: 10.11.0.4
+#    networks:
+#      net1:
+#        ipv4_address: 10.11.0.4
     command: sh -c "
                     tail -f /dev/null
                    "
@@ -82,9 +82,9 @@ services:
     ports:
       - '22'
     restart: always
-    networks:
-      net1:
-        ipv4_address: 10.11.0.5
+#    networks:
+#      net1:
+#        ipv4_address: 10.11.0.5
 
   node-rockylinux:
     build:
@@ -99,6 +99,38 @@ services:
     ports:
       - '22'
     restart: always
-    networks:
-      net1:
-        ipv4_address: 10.11.0.6
+#    networks:
+#      net1:
+#        ipv4_address: 10.11.0.6
+
+  vault:
+    image: vault
+    container_name: vault
+    volumes:
+      - ssh-key:/tmp/ansible/
+    deploy:
+      replicas: 1
+    ports:
+      - '22'
+      - '8200:8200'
+    restart: always
+#    networks:
+#      net1:
+#        ipv4_address: 10.11.0.6
+
+  ansible2:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.ansible2
+    image: ansible2
+    container_name: ansible2
+    volumes:
+      - ssh-key:/tmp/ansible/
+    deploy:
+      replicas: 1
+    ports:
+      - '22'
+    restart: always
+  #    networks:
+  #      net1:
+  #        ipv4_address: 10.11.0.6

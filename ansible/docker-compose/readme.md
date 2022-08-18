@@ -2,6 +2,7 @@
 
 Consists of:
 - ansible + [ARA](http://localhost:8000/)
+- [vault](http://localhost:8200/)
 - node_alpine
 - node_redhat
 - node_ubuntu
@@ -60,8 +61,14 @@ ansible-doc -t connection -l
 ansible-inventory -i inventory.yaml --graph
 
 
-amazonlinux
+
+ansible-vault create file.yml
+
+ansible-vault edit file.yml
 
 
-
-
+python -m virtualenv --version
+python -m virtualenv ansible
+.\ansible\Scripts\activate.ps1
+pip list
+pip install ansible-vault
