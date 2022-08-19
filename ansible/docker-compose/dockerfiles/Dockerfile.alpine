@@ -4,7 +4,7 @@ ARG USERNAME=ansible
 COPY scripts/alpine-entrypoint.sh /docker-entrypoint.sh
 
 RUN apk update &&\
-  apk add --update --no-cache sudo openrc openssh-keygen openssh python3 py3-pip &&\
+  apk add --update --no-cache sudo openrc openssh-keygen openssh &&\
   (adduser $USERNAME -D -s /bin/sh || true) &&\
   (echo "$USERNAME:$USERNAME" | chpasswd) &&\
   echo "ansible ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/$USERNAME &&\

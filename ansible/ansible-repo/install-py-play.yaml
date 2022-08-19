@@ -1,0 +1,20 @@
+---
+- name: Install python in target node with ansible
+  hosts: all
+  become: true
+  gather_facts: no
+  tasks:
+    - name: install python deb
+      raw: apt-get -y -qq update && apt-get -y -qq install python3
+      when: ansible_distribution == "Ubuntu"
+      ignore_errors: yes
+
+    - name: install python apk
+      raw: apk update && apk add --update --no-cache python3
+      when: ansible_distribution == "Alpine"
+      ignore_errors: yes
+
+    - name: install python rpm
+      raw: yum -y -qq update && yum -y -qq install python3
+      when: ansible_distribution == "RedHat" or ansible_distribution == "Rocky"
+      ignore_errors: yes

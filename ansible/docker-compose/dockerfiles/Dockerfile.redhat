@@ -1,11 +1,12 @@
 FROM redhat/ubi9
 
+ARG USERNAME=ansible
 COPY scripts/redhat-entrypoint.sh /docker-entrypoint.sh
 
 RUN yum -y -qq update && \
-  yum -y -qq install sudo python3 openssh-server &&\
+  yum -y -qq install sudo openssh-server &&\
   chmod +x /docker-entrypoint.sh &&\
-  (useradd -m ansible -s /bin/bash || true) &&\
+  (useradd -m $USERNAME -s /bin/bash || true) &&\
   (echo "ansible:ansible" | chpasswd) &&\
   echo "ansible ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/ansible &&\
   su - ansible -c "mkdir -p ~/.ssh" &&\

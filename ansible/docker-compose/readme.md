@@ -21,9 +21,11 @@ docker-compose up --build
 
 Connect to ansible
 ```
-docker exec -it ansible bash
+docker exec -it ansible1 bash
+ansible -i inventory.yaml all -m setup | grep -i distribution
 ansible -i inventory.yaml all -m ping
 ansible-playbook -i inventory.yaml playbook.yaml
+ansible-playbook -i inventory.yaml install-py-play.yaml
 ```
 
 Run ARA

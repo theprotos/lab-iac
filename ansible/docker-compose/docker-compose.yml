@@ -6,18 +6,20 @@ version: '3.8'
 #      config:
 #        - subnet: 10.11.0.0/24
 volumes:
+  ssh-key-pub:
   ssh-key:
 
 services:
 
   ansible1:
     build:
-      context: .
-      dockerfile: dockerfiles/Dockerfile.ansible1
+      context: ../docker-compose
+      dockerfile: ../docker-compose/dockerfiles/Dockerfile.ansible1
     image: ansible1
     container_name: ansible1
     volumes:
-      - ssh-key:/tmp/ansible:ro
+      - ssh-key-pub:/tmp/ansible:ro
+      - ssh-key:/tmp/ansible.key:ro
     deploy:
       replicas: 1
     ports:
@@ -33,12 +35,12 @@ services:
 
   node-ubuntu:
     build:
-      context: .
-      dockerfile: dockerfiles/Dockerfile.ubuntu
+      context: ../docker-compose
+      dockerfile: ../docker-compose/dockerfiles/Dockerfile.ubuntu
     image: node-ubuntu
     container_name: node-ubuntu
     volumes:
-      - ssh-key:/tmp/ansible:ro
+      - ssh-key-pub:/tmp/ansible:ro
     deploy:
       replicas: 1
     ports:
@@ -51,12 +53,12 @@ services:
   node-redhat:
     # privileged: true
     build:
-      context: .
-      dockerfile: dockerfiles/Dockerfile.redhat
+      context: ../docker-compose
+      dockerfile: ../docker-compose/dockerfiles/Dockerfile.redhat
     image: node-redhat
     container_name: node-redhat
     volumes:
-      - ssh-key:/tmp/ansible/
+      - ssh-key-pub:/tmp/ansible/
     deploy:
       replicas: 1
     ports:
@@ -71,12 +73,12 @@ services:
 
   node-alpine:
     build:
-      context: .
-      dockerfile: dockerfiles/Dockerfile.alpine
+      context: ../docker-compose
+      dockerfile: ../docker-compose/dockerfiles/Dockerfile.alpine
     image: node-alpine
     container_name: node-alpine
     volumes:
-      - ssh-key:/tmp/ansible:ro
+      - ssh-key-pub:/tmp/ansible:ro
     deploy:
       replicas: 1
     ports:
@@ -88,12 +90,12 @@ services:
 
   node-rockylinux:
     build:
-      context: .
-      dockerfile: dockerfiles/Dockerfile.rockylinux
+      context: ../docker-compose
+      dockerfile: ../docker-compose/dockerfiles/Dockerfile.rockylinux
     image: node-rockylinux
     container_name: node-rockylinux
     volumes:
-      - ssh-key:/tmp/ansible/
+      - ssh-key-pub:/tmp/ansible/
     deploy:
       replicas: 1
     ports:
@@ -107,7 +109,7 @@ services:
     image: vault
     container_name: vault
     volumes:
-      - ssh-key:/tmp/ansible/
+      - ssh-key-pub:/tmp/ansible/
     deploy:
       replicas: 1
     ports:
@@ -120,12 +122,13 @@ services:
 
   ansible2:
     build:
-      context: .
-      dockerfile: dockerfiles/Dockerfile.ansible2
+      context: ../docker-compose
+      dockerfile: ../docker-compose/dockerfiles/Dockerfile.ansible2
     image: ansible2
     container_name: ansible2
     volumes:
-      - ssh-key:/tmp/ansible/
+      - ssh-key-pub:/tmp/ansible/:ro
+      - ssh-key:/tmp/ansible.key:ro
     deploy:
       replicas: 1
     ports:

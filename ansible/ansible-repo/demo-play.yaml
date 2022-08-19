@@ -8,7 +8,9 @@
       package:
         name: apache2
         state: latest
+      when: ansible_distribution == "Ubuntu"
     - name: ensure apache is running
-      service:
-        name: httpd
+      ansible.builtin.service:
+        name: apache2
         state: started
+      when: ansible_distribution == "Ubuntu"

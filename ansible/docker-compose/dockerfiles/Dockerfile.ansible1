@@ -3,39 +3,42 @@ FROM ubuntu
 ARG USERNAME=ansible
 ENV PATH=$PATH:/home/$USERNAME/.local/bin \
     ANSIBLE_HOST_KEY_CHECKING=False \
-    ANSIBLE_REPO="https://raw.githubusercontent.com/theprotos/lab-iac/master/ansible/ansible-repo"
+    ANSIBLE_REPO="https://github.com/theprotos/lab-iac.git"
 
-ADD https://releases.ansible.com/ansible-tower/setup/ansible-tower-setup-latest.tar.gz /tmp/ansible-tower.tar.gz
-COPY scripts/ansible-entrypoint.sh /docker-entrypoint.sh
+COPY scripts/ansible1-entrypoint.sh /docker-entrypoint.sh
+COPY requirements.yaml /home/$USERNAME/
 
 USER root
 
 RUN apt-get -y -qq update
 
-RUN apt-get -y -qq install sudo openssh-client python3 iputils-ping python3-pip
+RUN apt-get -y -qq install git p7zip-full sudo curl openssh-client python3 iputils-ping python3-pip
 RUN  chmod +x /docker-entrypoint.sh &&\
+  ln -s /usr/bin/python3 /usr/bin/python &&\
   echo "StrictHostKeyChecking no" >> /etc/ssh_config &&\
-  (useradd -m $USERNAME -s /bin/bash || true) &&\
+  (useradd -m $USERNAME -s /bin/sh || true) &&\
+  chown -R $USERNAME:$USERNAME /home/$USERNAME &&\
   (echo "$USERNAME:$USERNAME" | chpasswd) &&\
-  chmod 755 /tmp/ansible-tower.tar.gz &&\
   echo "$USERNAME ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/$USERNAME &&\
   apt-get autoremove -y -q &&\
-  apt-get clean -y -q
+  apt-get clean -y -q &&\
+  git clone --depth 1 -b master $ANSIBLE_REPO /tmp/repo &&\
+  mkdir -p /etc/ansible/ &&\
+  cp /tmp/repo/ansible/ansible-repo/ansible.cfg /etc/ansible/ansible.cfg &&\
+  cp /tmp/repo/ansible/ansible-repo/*-play.yaml /home/$USERNAME/
 
 USER $USERNAME
 
 RUN mkdir -p ~/.ssh &&\
   mkdir -p /tmp/$USERNAME &&\
   chmod 700 ~/.ssh &&\
-  tar xvzf /tmp/ansible-tower.tar.gz -C /home/$USERNAME &&\
-  python3 -m pip install --user ansible "ara[server]"
+  python3 -m pip install --upgrade pip &&\
+  python3 -m pip install -r /home/$USERNAME/requirements.yaml
 
 RUN ssh-keygen -q -t rsa -N '' -f ~/.ssh/$USERNAME &&\
+  cp ~/.ssh/$USERNAME.pub /tmp/$USERNAME/$USERNAME.pub &&\
   cp ~/.ssh/$USERNAME.pub /tmp/$USERNAME/$USERNAME.pub
 
-COPY *-play.yaml inventory.yaml /home/$USERNAME/
-ADD $ANSIBLE_REPO/ansible.cfg /etc/ansible/ansible.cfg
-ADD $ANSIBLE_REPO/ansible_requirements.yaml /home/$USERNAME/
 
 #ENV ANSIBLE_CALLBACK_PLUGINS="$(python3 -m ara.setup.callback_plugins)"
 
