@@ -12,7 +12,7 @@ USER root
 
 RUN apt-get -y -qq update
 
-RUN apt-get -y -qq install git p7zip-full sudo curl openssh-client python3 iputils-ping python3-pip
+RUN apt-get -y -qq install iputils-ping curl vim git p7zip-full sudo openssh-client python3 python3-pip
 RUN  chmod +x /docker-entrypoint.sh &&\
   ln -s /usr/bin/python3 /usr/bin/python &&\
   echo "StrictHostKeyChecking no" >> /etc/ssh_config &&\
@@ -25,7 +25,8 @@ RUN  chmod +x /docker-entrypoint.sh &&\
   git clone --depth 1 -b master $ANSIBLE_REPO /tmp/repo &&\
   mkdir -p /etc/ansible/ &&\
   cp /tmp/repo/ansible/ansible-repo/ansible.cfg /etc/ansible/ansible.cfg &&\
-  cp /tmp/repo/ansible/ansible-repo/*-play.yaml /home/$USERNAME/
+  cp /tmp/repo/ansible/ansible-repo/playbooks /home/$USERNAME/ &&\
+  cp /tmp/repo/ansible/ansible-repo/inventories /home/$USERNAME/
 
 USER $USERNAME
 

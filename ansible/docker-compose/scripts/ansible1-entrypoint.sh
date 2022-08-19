@@ -8,10 +8,12 @@ echo $ANSIBLE_CALLBACK_PLUGINS
 
 
 ara-manage migrate
-#ansible -i inventory.yaml all -m ping
+ansible -i inventory.yaml all -m ping
+ansible-playbook -i inventory.yaml install-py-play.yaml
 #ansible -i inventory.yaml all -m setup | grep -i distribution
+
 #ansible-playbook -i inventory.yaml demo-play.yaml
-#ansible-playbook -i inventory.yaml install-py-play.yaml
+
 ara playbook list
 ara-manage runserver 0.0.0.0:8000
 
