@@ -2,29 +2,12 @@ all:
   vars:
     ansible_user: ansible
     ansible_ssh_private_key_file: '~/.ssh/ansible'
-  children:
-    ansible:
-    nodes:
-
-ansible:
   hosts:
     ansible1:
     ansible2:
-nodes:
-  hosts:
     node-ubuntu:
       ansible-host: node-ubuntu
       ansible_user: ansible
     node-redhat:
     node-alpine:
     node-rockylinux:
-  vars:
-    ansible_user: ansible
-    ansible_ssh_private_key_file: '~/.ssh/ansible'
-webservers:
-  hosts:
-    node-ubuntu:
-    node-redhat:
-  vars:
-    ansible_user: ansible
-    ansible_ssh_private_key_file: '~/.ssh/ansible'

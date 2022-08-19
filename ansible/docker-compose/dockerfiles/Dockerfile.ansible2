@@ -3,18 +3,18 @@ FROM centos
 ARG USERNAME=ansible
 ENV PATH=$PATH:/home/$USERNAME/.local/bin \
     ANSIBLE_HOST_KEY_CHECKING=False \
-    ANSIBLE_REPO="https://raw.githubusercontent.com/theprotos/lab-iac/master/ansible/ansible-repo"
+    ANSIBLE_REPO="https://github.com/theprotos/lab-iac.git"
 
 COPY scripts/ansible2-entrypoint.sh /docker-entrypoint.sh
-COPY requirements.yaml /home/$USERNAME/
+COPY requirements.txt /home/$USERNAME/
 ADD https://releases.ansible.com/ansible-tower/setup/ansible-tower-setup-latest.tar.gz /tmp/ansible-tower.tar.gz
-
 
 RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-* &&\
   sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-* &&\
   yum -y -qq update && yum -y -qq install epel-release && yum -y -qq update &&\
-  yum -y -qq install p7zip sudo python3 python3-pip &&\
-  (useradd -m $USERNAME -s /bin/bash || true) &&\
+  yum -y -qq install git p7zip openssh-server sudo python3 python3-pip &&\
+  (useradd -m $USERNAME -s /bin/sh || true) &&\
+  chown -R $USERNAME:$USERNAME /home/$USERNAME &&\
   (echo "$USERNAME:$USERNAME" | chpasswd) &&\
   chmod 755 /tmp/ansible-tower.tar.gz &&\
   echo "ansible ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/$USERNAME &&\
@@ -22,23 +22,25 @@ RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-* &&\
   su - ansible -c "chmod 700 ~/.ssh" &&\
   yum clean all
 
+RUN git clone --depth 1 -b master $ANSIBLE_REPO /tmp/repo &&\
+  mkdir -p /etc/ansible/ &&\
+  cp -r /tmp/repo/ansible/ansible-repo/ansible.cfg /etc/ansible/ansible.cfg &&\
+  cp -r /tmp/repo/ansible/ansible-repo/playbooks /home/$USERNAME/ &&\
+  cp -r /tmp/repo/ansible/ansible-repo/inventories /home/$USERNAME/
+
 USER $USERNAME
 
 RUN mkdir -p ~/.ssh &&\
   mkdir -p /tmp/$USERNAME &&\
   chmod 700 ~/.ssh &&\
-  python3 -m pip install --upgrade pip &&\
-  python3 -m pip install -r /home/$USERNAME/requirements.yaml &&\
+  python3 -m pip install --user --upgrade pip &&\
+  python3 -m pip install --user -r /home/$USERNAME/requirements.txt &&\
   7za x -tgzip -so /tmp/ansible-tower.tar.gz | 7za x -si -ttar -o/tmp
 
-
-COPY *-play.yaml inventory.yaml /home/ansible/
-ADD $ANSIBLE_REPO/ansible.cfg /etc/ansible/ansible.cfg
 ENV ANSIBLE_CALLBACK_PLUGINS="$(python3 -m ara.setup.callback_plugins)"
-
 WORKDIR /home/$USERNAME
 
 EXPOSE 22
 
-ENTRYPOINT ["sh", "/docker-entrypoint.sh"]
-#CMD ["tail", "-f", "/dev/null"]
+#ENTRYPOINT ["sh", "/docker-entrypoint.sh"]
+ENTRYPOINT ["tail", "-f", "/dev/null"]

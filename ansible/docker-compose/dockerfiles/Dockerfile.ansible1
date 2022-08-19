@@ -6,14 +6,14 @@ ENV PATH=$PATH:/home/$USERNAME/.local/bin \
     ANSIBLE_REPO="https://github.com/theprotos/lab-iac.git"
 
 COPY scripts/ansible1-entrypoint.sh /docker-entrypoint.sh
-COPY requirements.yaml /home/$USERNAME/
+COPY requirements.txt /home/$USERNAME/
 
-USER root
+#USER root
 
 RUN apt-get -y -qq update
 
-RUN apt-get -y -qq install iputils-ping curl vim git p7zip-full sudo openssh-client python3 python3-pip
-RUN  chmod +x /docker-entrypoint.sh &&\
+RUN apt-get -y -qq install iputils-ping curl vim openssh-server git p7zip-full sudo openssh-client python3 python3-pip
+RUN chmod +x /docker-entrypoint.sh &&\
   ln -s /usr/bin/python3 /usr/bin/python &&\
   echo "StrictHostKeyChecking no" >> /etc/ssh_config &&\
   (useradd -m $USERNAME -s /bin/sh || true) &&\
@@ -21,12 +21,13 @@ RUN  chmod +x /docker-entrypoint.sh &&\
   (echo "$USERNAME:$USERNAME" | chpasswd) &&\
   echo "$USERNAME ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/$USERNAME &&\
   apt-get autoremove -y -q &&\
-  apt-get clean -y -q &&\
-  git clone --depth 1 -b master $ANSIBLE_REPO /tmp/repo &&\
+  apt-get clean -y -q
+
+RUN git clone --depth 1 -b master $ANSIBLE_REPO /tmp/repo &&\
   mkdir -p /etc/ansible/ &&\
-  cp /tmp/repo/ansible/ansible-repo/ansible.cfg /etc/ansible/ansible.cfg &&\
-  cp /tmp/repo/ansible/ansible-repo/playbooks /home/$USERNAME/ &&\
-  cp /tmp/repo/ansible/ansible-repo/inventories /home/$USERNAME/
+  cp -r /tmp/repo/ansible/ansible-repo/ansible.cfg /etc/ansible/ansible.cfg &&\
+  cp -r /tmp/repo/ansible/ansible-repo/playbooks /home/$USERNAME/ &&\
+  cp -r /tmp/repo/ansible/ansible-repo/inventories /home/$USERNAME/
 
 USER $USERNAME
 
@@ -34,10 +35,10 @@ RUN mkdir -p ~/.ssh &&\
   mkdir -p /tmp/$USERNAME &&\
   chmod 700 ~/.ssh &&\
   python3 -m pip install --upgrade pip &&\
-  python3 -m pip install -r /home/$USERNAME/requirements.yaml
+  python3 -m pip install -r /home/$USERNAME/requirements.txt
 
 RUN ssh-keygen -q -t rsa -N '' -f ~/.ssh/$USERNAME &&\
-  cp ~/.ssh/$USERNAME.pub /tmp/$USERNAME/$USERNAME.pub &&\
+  cp ~/.ssh/$USERNAME /tmp/$USERNAME/${USERNAME}.key &&\
   cp ~/.ssh/$USERNAME.pub /tmp/$USERNAME/$USERNAME.pub
 
 
