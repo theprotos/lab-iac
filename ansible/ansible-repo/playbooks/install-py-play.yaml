@@ -2,7 +2,7 @@
 - name: Install python in target node with ansible
   hosts: all
   become: true
-  gather_facts: no
+  gather_facts: yes
   tasks:
     - name: install python deb
       raw: apt-get -y -qq update && apt-get -y -qq install python3

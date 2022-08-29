@@ -5,8 +5,9 @@ chmod ansible:ansible /home/ansible/.ssh/authorized_keys 2>/dev/null || :
 
 export ANSIBLE_CALLBACK_PLUGINS=$(python3 -m ara.setup.callback_plugins)
 
-mkdir -p /var/run/sshd
-/usr/sbin/sshd -D -e
+sudo ssh-keygen -A
+sudo mkdir -p /var/run/sshd
+sudo /usr/sbin/sshd
 
 ara-manage migrate
 ansible -i inventories all -m ping #-vvvv
